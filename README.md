@@ -430,6 +430,15 @@ sudo systemctl disable pppd.service
 ```
 
 ## 11 - Switch to Preferred Wifi Automatically
+```
+sudo apt install network-manager
+nmcli connection add type wifi ifname "*" con-name "MDTK_RPI" ssid "MDTK_RPI"
+nmcli connection modify "MDTK_RPI" wifi-sec.key-mgmt wpa-psk wifi-sec.psk "17B74|q1*gg"
+nmcli connection modify "MDTK_RPI" connection.autoconnect yes
+nmcli connection modify "MDTK_RPI" connection.autoconnect-priority 10
+nmcli connection show "MDTK_RPI"
+
+```
 Create shell script
 ```
 sudo nano /usr/local/bin/preferred_wifi_switch.sh
