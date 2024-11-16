@@ -72,6 +72,7 @@ Tools/environment_install/install-prereqs-ubuntu.sh -y
 . ~/.profile
 sudo reboot
 ```
+
 ### 2.3 - ROS 2
 Install ROS 2 Humble ([more info here](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html)).
 
@@ -105,6 +106,7 @@ Finally, permanently source the ROS location in your shell startup script.
 echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 sudo reboot
 ``` 
+
 ### 2.4 - Ardupilot ROS 2 Repos
 Use these steps to download the ROS 2 repos for Ardupilot DDS and install the dependencies. Based off these guides ([wiki](https://ardupilot.org/dev/docs/ros2.html), [git readme](https://github.com/ArduPilot/ardupilot/tree/master/Tools/ros2#install-ubuntu)).
 ```
@@ -117,6 +119,7 @@ sudo rosdep init
 rosdep update
 rosdep install --rosdistro humble --from-paths src --ignore-src
 ```
+
 ### 2.5 - Micro-XRCE-DDS-Gen
 Install Micro-XRCE-DDS-Gen. This is needed when building the Ardupilot firmware with DDS enabled.
 ```
@@ -128,6 +131,7 @@ cd Micro-XRCE-DDS-Gen/
 echo "export PATH=\$PATH:$PWD/scripts" >> ~/.bashrc
 sudo reboot
 ```
+
 ### 2.6 - Colcon Build
 Now is time to build the ROS 2 packages using `colcon`. You have 2 options for building: either you build only for a companion computer that will not be used for SITL, or you build for a computer on which you might use SITL. Most likely, you will not be using your RPi4 for SITL.
 
@@ -178,7 +182,6 @@ This will take some time.
 Now you must set the correct parameters in Ardupilot. You will have to reboot and/or refresh the parameters multiples times, as you will be enabling multiple "enable" parameters. You can use Mavproxy on your RPi4 to edit the parameters (`mavproxy.py --console` will detect the flight controller connected via USB), or connect your flight controller to a PC with Mission Planner. 
 
 ### 5.1 - Serial Port Parameters:
-
 ```
 SERIAL1_PROTOCOL,48
 SERIAL1_BAUD,12500000
@@ -288,7 +291,7 @@ View the contents of a topic with
 ros2 topic echo /ap/imu/experimental/data
 ```
 
-## 8 - Updating Repos and Dependencies
+## 7 - Updating Repos and Dependencies
 ```
 cd ~/ardupilot
 git pull --recurse-submodules
@@ -311,7 +314,22 @@ rosdep install --rosdistro humble --from-paths src --ignore-src
 ```
 colcon build --packages-select micro_ros_agent
 ```
-## 8 - Forward Webserver to Other PC
+
+## 8 - Enable SSH
+```
+sudo apt update
+sudo apt install openssh-server
+```
+```
+sudo systemctl enable ssh
+sudo systemctl start ssh
+```
+Check RPi IP address
+```
+hostname -I
+```
+
+## 9 - Forward Webserver to Other PC
 
 Edit `/etc/sysctl.conf` and uncomment
 ```
@@ -328,7 +346,7 @@ sudo apt install iptables-persistent
 sudo netfilter-persistent save
 ```
 
-## 9 - Run PPPD at Boot
+## 10 - Run PPPD at Boot
 Create `pppd` parameter file
 ```
 sudo nano /etc/ppp/ip_config.txt
@@ -393,7 +411,7 @@ sudo systemctl stop pppd.service
 sudo systemctl disable pppd.service
 ```
 
-## 10 - Switch to Preferred Wifi Automatically
+## 11 - Switch to Preferred Wifi Automatically
 Create shell script
 ```
 sudo nano /usr/local/bin/preferred_wifi_switch.sh
@@ -456,3 +474,4 @@ WantedBy=multi-user.target
 ```
 sudo systemctl enable wifi-switch.service
 sudo systemctl start wifi-switch.service
+```
