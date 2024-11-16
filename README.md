@@ -437,8 +437,9 @@ nmcli connection modify "MDTK_RPI" wifi-sec.key-mgmt wpa-psk wifi-sec.psk "17B74
 nmcli connection modify "MDTK_RPI" connection.autoconnect yes
 nmcli connection modify "MDTK_RPI" connection.autoconnect-priority 10
 nmcli connection show "MDTK_RPI"
-
 ```
+Edit ` sudo nano /etc/netplan/*.yaml` and change to `renderer: NetworkManager`.
+
 Create shell script
 ```
 sudo nano /usr/local/bin/preferred_wifi_switch.sh
