@@ -62,7 +62,25 @@ gpu_freq=750
 ```
 This will not improve DDS or PPP. It's only in case you plan on running CPU intensive algorithms alongside DDS.
 
-### 2.2 - Ardupilot
+### 2.2 - If Ubuntu Server and SSH
+Issue where the "Wait for network" service unnecessarily making the boot long
+```
+sudo systemctl edit systemd-networkd-wait-online
+```
+Add this under the first two commented lines
+```
+[Service]
+ExecStart=
+ExecStart=/lib/systemd/systemd-networkd-wait-online --timeout=10 --interface=wlan0
+```
+Then
+```
+sudo systemctl daemon-reload 
+sudo systemctl restart systemd-networkd-wait-online
+sudo reboot
+```
+
+### 2.3 - Ardupilot
 Install the Ardupilot development environment ([more info here](https://ardupilot.org/dev/docs/building-setup-linux.html)).
 ```
 sudo apt install git -y
@@ -73,7 +91,7 @@ Tools/environment_install/install-prereqs-ubuntu.sh -y
 sudo reboot
 ```
 
-### 2.3 - ROS 2
+### 2.4 - ROS 2
 Install ROS 2 Humble ([more info here](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html)).
 
 Make sure your locales are set to `UTF-8`
@@ -107,7 +125,7 @@ echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 sudo reboot
 ``` 
 
-### 2.4 - Ardupilot ROS 2 Repos
+### 2.5 - Ardupilot ROS 2 Repos
 Use these steps to download the ROS 2 repos for Ardupilot DDS and install the dependencies. Based off these guides ([wiki](https://ardupilot.org/dev/docs/ros2.html), [git readme](https://github.com/ArduPilot/ardupilot/tree/master/Tools/ros2#install-ubuntu)).
 ```
 mkdir -p ~/ros2_ws/src && cd ~/ros2_ws/src
@@ -120,7 +138,7 @@ rosdep update
 rosdep install --rosdistro humble --from-paths src --ignore-src
 ```
 
-### 2.5 - Micro-XRCE-DDS-Gen
+### 2.6 - Micro-XRCE-DDS-Gen
 Install Micro-XRCE-DDS-Gen. This is needed when building the Ardupilot firmware with DDS enabled.
 ```
 sudo apt install default-jre -y
@@ -132,7 +150,7 @@ echo "export PATH=\$PATH:$PWD/scripts" >> ~/.bashrc
 sudo reboot
 ```
 
-### 2.6 - Colcon Build
+### 2.7 - Colcon Build
 Now is time to build the ROS 2 packages using `colcon`. You have 2 options for building: either you build only for a companion computer that will not be used for SITL, or you build for a computer on which you might use SITL. Most likely, you will not be using your RPi4 for SITL.
 
 **Companion computer without SITL packages**
@@ -148,7 +166,7 @@ colcon build --packages-up-to ardupilot_dds_tests
 
 The latter option will take a lot more time to build on a RPi4.
 
-### 2.7 - PPPD
+### 2.8 - PPPD
 To enable the use of `pppd` (which is what is used on the Pi to enable the PPP connection with the flight controller), run this command
 ```
 sudo apt install linux-modules-extra-raspi
