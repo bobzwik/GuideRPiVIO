@@ -432,13 +432,20 @@ sudo systemctl disable pppd.service
 ## 11 - Switch to Preferred Wifi Automatically
 ```
 sudo apt install network-manager
-nmcli connection add type wifi ifname "*" con-name "MDTK_RPI" ssid "MDTK_RPI"
-nmcli connection modify "MDTK_RPI" wifi-sec.key-mgmt wpa-psk wifi-sec.psk "17B74|q1*gg"
-nmcli connection modify "MDTK_RPI" connection.autoconnect yes
-nmcli connection modify "MDTK_RPI" connection.autoconnect-priority 10
-nmcli connection show "MDTK_RPI"
+sudo nmcli connection add type wifi ifname "*" con-name MDTK_RPI ssid MDTK_RPI
+sudo nmcli connection modify MDTK_RPI wifi-sec.key-mgmt wpa-psk wifi-sec.psk "17B74|q1*gg"
+sudo nmcli connection modify MDTK_RPI connection.autoconnect yes
+sudo nmcli connection modify MDTK_RPI connection.autoconnect-priority 10
+sudo nmcli connection modify MDTK_RPI ipv4.addresses 192.168.137.100/24 
+sudo nmcli connection modify MDTK_RPI ipv4.gateway 192.168.137.1 
+sudo nmcli connection modify MDTK_RPI ipv4.dns 8.8.8.8 
+sudo nmcli connection modify MDTK_RPI ipv4.method manual
+nmcli connection show MDTK_RPI
 ```
-Edit ` sudo nano /etc/netplan/*.yaml` and change to `renderer: NetworkManager`.
+Edit ` sudo nano /etc/netplan/*.yaml` and change to `renderer: NetworkManager`. Then
+```
+sudo netplan apply
+```
 
 Create shell script
 ```
