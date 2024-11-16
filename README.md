@@ -393,3 +393,66 @@ sudo systemctl stop pppd.service
 sudo systemctl disable pppd.service
 ```
 
+## 10 - Switch to Preferred Wifi Automatically
+Create shell script
+```
+sudo nano /usr/local/bin/preferred_wifi_switch.sh
+```
+And add
+```
+#!/bin/bash
+
+# Define the preferred Wi-Fi network
+PREFERRED="MDTK_RPI"
+DEBUG=true
+dbg() {
+    if [ "$DEBUG" = true ]; then
+        echo "$1"
+    fi
+}
+
+while true; do
+    # Get the name of the currently active connection
+    CURRENT=$(nmcli -g NAME con show --active)
+
+    # Check if the current network is not the preferred network
+    if [ "$CURRENT" != "$PREFERRED" ]; then
+        dbg "Currently connected to $CURRENT"
+
+        # Check if the preferred network is available
+        if nmcli -g SSID device wifi list | grep -Fqwx "$PREFERRED"; then
+            dbg "Attempting switch to $PREFERRED"
+            nmcli c up "$PREFERRED"
+        fi
+    fi
+    
+    # Wait 20 seconds before checking again
+    sleep 20
+done
+```
+Make it executable
+```
+sudo chmod +x /usr/local/bin/preferred_wifi_switch.sh
+```
+
+Create service file
+```
+sudo nano /etc/systemd/system/wifi-switch.service
+```
+And add
+```
+[Unit]
+Description=Wi-Fi Auto Switch Service
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/preferred_wifi_switch.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+```
+sudo systemctl enable wifi-switch.service
+sudo systemctl start wifi-switch.service
