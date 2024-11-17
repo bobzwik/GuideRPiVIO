@@ -510,3 +510,22 @@ WantedBy=multi-user.target
 sudo systemctl enable wifi-switch.service
 sudo systemctl start wifi-switch.service
 ```
+
+## 13 - Github SSH Key
+```
+ssh-keygen -t ed25519 -C "john.bobzwik@gmail.com"
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+```
+Then copy output of
+```
+cat ~/.ssh/id_ed25519.pub
+```
+
+## 14 - Custom IMU Subscriber
+```
+cd ~/ros2_ws/src
+git clone git@github.com:bobzwik/cpp_imu_sub.git
+cd ~/ros2_ws
+colcon build --packages-select cpp_imu_sub
+```
