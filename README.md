@@ -535,3 +535,4 @@ git clone git@github.com:bobzwik/cpp_imu_sub.git
 cd ~/ros2_ws
 colcon build --packages-select cpp_imu_sub
 ```
+If testing with LED, follow instructions here: https://github.com/bobzwik/cpp_imu_sub/blob/main/README.md
