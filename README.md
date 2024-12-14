@@ -45,6 +45,12 @@ To make sure the Primary UART (UART0) is unoccupied, disable the Bluetooth contr
 sudo systemctl disable hciuart
 sudo systemctl disable serial-getty@ttyAMA0.service
 ```
+To make sure to disable the serial Linux console, edit the file 
+```
+sudo nano /boot/firmware/cmdline.txt`
+```
+Remove the `console=serial0,115200` or similar entry, leaving the rest of the line intact.
+
 And then add yourself into the group `dialout` to be allowed to use the UART ports
 ```
 sudo usermod -a -G dialout $USER
