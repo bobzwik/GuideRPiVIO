@@ -47,7 +47,7 @@ sudo systemctl disable serial-getty@ttyAMA0.service
 ```
 To make sure to disable the serial Linux console, edit the file 
 ```
-sudo nano /boot/firmware/cmdline.txt`
+sudo nano /boot/firmware/cmdline.txt
 ```
 Remove the `console=serial0,115200` or similar entry, leaving the rest of the line intact.
 
