@@ -148,7 +148,6 @@ rosdep install --rosdistro humble --from-paths src --ignore-src
 Install Micro-XRCE-DDS-Gen. This is needed when building the Ardupilot firmware with DDS enabled.
 ```
 sudo apt install default-jre -y
-cd ~/ros2_ws
 git clone --recurse-submodules https://github.com/ardupilot/Micro-XRCE-DDS-Gen.git
 cd Micro-XRCE-DDS-Gen/
 ./gradlew assemble
