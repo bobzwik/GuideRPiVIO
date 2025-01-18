@@ -175,15 +175,15 @@ WORKDIR /ros2_ws/src
 RUN wget https://raw.githubusercontent.com/bobzwik/GuideRPiVIO/main/ros2.repos && \
     vcs import --recursive < ros2.repos
 
-# Copy other ROS packages
-COPY ros2_ws /ros2_ws/
-
 # Install pigpio (needed for cpp_imu_sub)
 WORKDIR /
 RUN git clone https://github.com/joan2937/pigpio  \
     && cd pigpio \
     && make \
     && make install
+
+# Copy other ROS packages
+COPY ros2_ws /ros2_ws/
 
 # Install dependencies for the workspace 
 WORKDIR /ros2_ws
