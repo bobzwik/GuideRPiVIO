@@ -16,7 +16,7 @@ Gnd   ==> Gnd
 ## 2 - Raspberry Pi 4 Setup
 
 ### 2.1 - Ubuntu and Pi Setup
-Flash SD card with Ubuntu 22.04 LTS (64 bit) using [Raspberry Pi Imager](https://www.raspberrypi.com/software/). This guide should work for both Desktop or Server versions of Ubuntu, but if you're going Server, it would be best to configure your networking before going too far in the setup process, to allow yourself to `ssh` into the RPi4 and copy/paste the commands from a PC with a web explorer. 
+Flash SD card with Raspberry Pi OS Bookworm (64 bit) using [Raspberry Pi Imager](https://www.raspberrypi.com/software/). This guide should work for both Desktop or Server versions of Pi OS, but if you're going Server, it would be best to configure your networking before going too far in the setup process, to allow yourself to `ssh` into the RPi4 and copy/paste the commands from a PC with a web explorer. 
 ```
 sudo update
 sudo rpi-eeprom-update -a
@@ -89,10 +89,10 @@ sudo reboot
 ```
 
 ### 2.3 - PPPD
-Most likely, the version by default on your Ubuntu 22.04 is version `2.4.9` (you can check with `pppd --version`. While you can still use version `2.4.9`, it will not be able to achieve the fastest 12.5M baudrate. You will need version `2.5.1`.
+Most likely, the version by default on Bookworm is version `2.4.9` (you can check with `pppd --version`. While you can still use version `2.4.9`, it will not be able to achieve the fastest 12.5M baudrate. You will need version `2.5.1`.
 ```
 cd ~
-sudo apt update && sudo apt install build-essential libssl-dev autogen autoconf libtool -y
+sudo apt update && sudo apt install curl build-essential libssl-dev autogen autoconf libtool -y
 curl -L https://github.com/ppp-project/ppp/archive/refs/tags/ppp-2.5.1.tar.gz | tar -xz
 cd ~/ppp-ppp-2.5.1
 autoreconf -i 
