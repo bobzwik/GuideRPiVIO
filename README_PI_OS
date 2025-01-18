@@ -1,3 +1,5 @@
+
+
 # GuideRPiVIO
 
 ## 1 - Wiring
@@ -86,92 +88,7 @@ sudo systemctl restart systemd-networkd-wait-online
 sudo reboot
 ```
 
-### 2.3 - Ardupilot
-Install the Ardupilot development environment ([more info here](https://ardupilot.org/dev/docs/building-setup-linux.html)).
-```
-sudo apt install git -y
-git clone --recurse-submodules https://github.com/ArduPilot/ardupilot.git
-cd ardupilot
-Tools/environment_install/install-prereqs-ubuntu.sh -y
-. ~/.profile
-sudo reboot
-```
-
-### 2.4 - ROS 2
-Install ROS 2 Humble ([more info here](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html)).
-
-Make sure your locales are set to `UTF-8`
-```
-locale  # check for UTF-8
-
-sudo apt update && sudo apt install locales
-sudo locale-gen en_US en_US.UTF-8
-sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
-export LANG=en_US.UTF-8
-
-locale  # verify settings
-```
-Setup the sources for `apt`
-```
-sudo apt install software-properties-common
-sudo add-apt-repository universe
-sudo apt update && sudo apt install curl -y
-sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
-```
-Install ROS 2 Humble
-```
-sudo apt update && sudo apt upgrade -y
-sudo apt install ros-humble-ros-base ros-dev-tools -y
-sudo apt install ros-humble-geographic-msgs -y
-```
-Finally, permanently source the ROS location in your shell startup script.
-```
-echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
-sudo reboot
-``` 
-
-### 2.5 - Ardupilot ROS 2 Repos
-Use these steps to download the ROS 2 repos for Ardupilot DDS and install the dependencies. Based off these guides ([wiki](https://ardupilot.org/dev/docs/ros2.html), [git readme](https://github.com/ArduPilot/ardupilot/tree/master/Tools/ros2#install-ubuntu)).
-```
-mkdir -p ~/ros2_ws/src && cd ~/ros2_ws/src
-wget https://raw.githubusercontent.com/ArduPilot/ardupilot/master/Tools/ros2/ros2.repos
-vcs import --recursive < ros2.repos
-cd ~/ros2_ws
-sudo apt update
-sudo rosdep init
-rosdep update
-rosdep install --rosdistro humble --from-paths src --ignore-src
-```
-
-### 2.6 - Micro-XRCE-DDS-Gen
-Install Micro-XRCE-DDS-Gen. This is needed when building the Ardupilot firmware with DDS enabled.
-```
-sudo apt install default-jre -y
-git clone --recurse-submodules https://github.com/ardupilot/Micro-XRCE-DDS-Gen.git
-cd Micro-XRCE-DDS-Gen/
-./gradlew assemble
-echo "export PATH=\$PATH:$PWD/scripts" >> ~/.bashrc
-sudo reboot
-```
-
-### 2.7 - Colcon Build
-Now is time to build the ROS 2 packages using `colcon`. You have 2 options for building: either you build only for a companion computer that will not be used for SITL, or you build for a computer on which you might use SITL. Most likely, you will not be using your RPi4 for SITL.
-
-**Companion computer without SITL packages**
-```
-cd ~/ros2_ws
-colcon build --packages-select micro_ros_agent
-```
-**Building for SITL and communication with hardware**
-```
-cd ~/ros2_ws
-colcon build --packages-up-to ardupilot_dds_tests
-```
-
-The latter option will take a lot more time to build on a RPi4.
-
-### 2.8 - PPPD
+### 2.3 - PPPD
 To enable the use of `pppd` (which is what is used on the Pi to enable the PPP connection with the flight controller), run this command
 ```
 sudo apt install linux-modules-extra-raspi
@@ -188,6 +105,139 @@ make
 sudo make install
 ```
 Andrew Tridgell has a [video](https://youtu.be/VGy6eOf7Uqk?si=zquWZOHEGXQJZNzV) showcasing the uses of PPP.
+
+### 2.4 - Ardupilot
+Install the Ardupilot development environment ([more info here](https://ardupilot.org/dev/docs/building-setup-linux.html)).
+```
+sudo apt install git -y
+git clone --recurse-submodules https://github.com/ArduPilot/ardupilot.git
+cd ardupilot
+Tools/environment_install/install-prereqs-ubuntu.sh -y
+. ~/.profile
+sudo reboot
+```
+
+### 2.5 - Micro-XRCE-DDS-Gen
+Install Micro-XRCE-DDS-Gen. This is needed when building the Ardupilot firmware with DDS enabled.
+```
+sudo apt install default-jre -y
+git clone --recurse-submodules https://github.com/ardupilot/Micro-XRCE-DDS-Gen.git
+cd Micro-XRCE-DDS-Gen/
+./gradlew assemble
+echo "export PATH=\$PATH:$PWD/scripts" >> ~/.bashrc
+sudo reboot
+```
+### 2.6 - cpp_imu_sub
+```
+mkdir -p ~/ros2_ws/src && cd ~/ros2_ws/src
+git clone https://github.com/bobzwik/cpp_imu_sub.git
+```
+
+### 2.7 - Install Docker
+```
+cd ~
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+```
+Post installation steps
+```
+sudo groupadd docker
+sudo usermod -aG docker $USER
+sudo reboot
+```
+### 2.8 - Create Docker Image
+Create Dockerfile
+```
+mkdir  ~/ros2_docker && cd ~/ros2_docker
+nano Dockerfile
+```
+And paste in the following script:
+```
+# Use the ROS Humble base image
+FROM ros:humble-ros-base
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+
+SHELL ["/bin/bash", "-c"]
+
+# Install necessary dependencies
+RUN apt-get update && apt-get install -y \
+    python3-vcstool \
+    python3-rosdep \
+    build-essential \
+    git \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a workspace and clone the repository
+WORKDIR /ros2_ws/src
+RUN wget https://raw.githubusercontent.com/bobzwik/GuideRPiVIO/main/ros2.repos && \
+    vcs import --recursive < ros2.repos
+
+# Copy other ROS packages
+COPY ros2_ws /ros2_ws/
+
+# Install pigpio (needed for cpp_imu_sub)
+WORKDIR /
+RUN git clone https://github.com/joan2937/pigpio  \
+    && cd pigpio \
+    && make \
+    && make install
+
+# Install dependencies for the workspace 
+WORKDIR /ros2_ws
+RUN apt-get update \
+    && rosdep update \
+    && rosdep install --rosdistro ${ROS_DISTRO} --from-paths src --ignore-src -y --skip-keys pigpio \
+    && rm -rf /var/lib/apt/lists/*
+
+# Build the workspace
+RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
+    && colcon build
+
+# Source the ROS files and ROS workspace build files, for every opened shell
+RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc \
+    && echo "source /ros2_ws/install/setup.bash" >> /etc/bash.bashrc
+
+# Copy entrypoint script into the image
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Set the default entrypoint
+ENTRYPOINT ["/entrypoint.sh"]
+
+# Default command (can be overridden)
+CMD ["bash"]
+```
+Create entrypoint.sh
+```
+nano entrypoint.sh
+```
+And paste in the following script:
+```
+#!/bin/bash
+set -e
+
+# Source ROS 2 and workspace setup files
+source /opt/ros/${ROS_DISTRO}/setup.bash
+source /ros2_ws/install/setup.bash
+
+# Start pigpio daemon
+sudo  pigpiod
+
+# Execute the passed command
+exec "$@"
+```
+Now build the docker image (takes about 730 seconds)
+```
+cd ~/ros2_docker
+docker build -t ros2_micro_ros_agent .
+```
+And run the image! (`--privileged` is for `pigpio` to connect to the RPi's GPIO)
+```
+docker run -it --rm --network=host --privileged ros2_micro_ros_agent
+```
 
 ## 3 - Flight Controller Setup
 If using a brand new flight controller that doesn't have Ardupilot pre-installed, you have to flash Ardupilot with bootloader. I recommend using [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html#get-software). This step doesn't have to be performed on the RPi 4, I prefer using a **Windows PC**. Download the latest or stable firmware for your board (for example, for the Matek H743, [from here](https://firmware.ardupilot.org/Copter/stable/MatekH743/)). Make sure you download the `_with_bl.hex` file. Then follow [this guide](https://www.mateksys.com/?p=6905) or [this video tutorial](https://www.youtube.com/watch?v=utdvxuuekSE).
