@@ -227,7 +227,7 @@ sudo  pigpiod
 # Execute the passed command
 exec "$@"
 ```
-Now build the docker image (takes about 730 seconds)
+Now build the docker image (takes about 530 seconds)
 ```
 cd ~/ros2_docker
 docker build -t ros2_micro_ros_agent .
