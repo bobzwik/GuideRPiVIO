@@ -96,7 +96,7 @@ sudo reboot
 ```
 Most likely, the version by default on your Ubuntu 22.04 is version `2.4.9` (you can check with `pppd --version`. While you can still use version `2.4.9`, it will not be able to achieve the fastest 12.5M baudrate. You will need version `2.5.1`.
 ```
-sudo apt update && sudo apt install build-essential libssl-dev -y
+sudo apt update && sudo apt install build-essential libssl-dev autogen autoconf libtool -y
 curl -L https://github.com/ppp-project/ppp/archive/refs/tags/ppp-2.5.1.tar.gz | tar -xz
 cd ~/ppp-ppp-2.5.1
 autoreconf -i 
