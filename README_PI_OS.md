@@ -127,7 +127,7 @@ sudo reboot
 ```
 ### 2.6 - cpp_imu_sub
 ```
-mkdir -p ~/ros2_ws/src && cd ~/ros2_ws/src
+mkdir -p ~/ros2_docker/ros2_ws/src && cd ~/ros2_docker/ros2_ws/src
 git clone https://github.com/bobzwik/cpp_imu_sub.git
 ```
 
@@ -146,7 +146,7 @@ sudo reboot
 ### 2.8 - Create Docker Image
 Create Dockerfile
 ```
-mkdir  ~/ros2_docker && cd ~/ros2_docker
+cd ~/ros2_docker
 nano Dockerfile
 ```
 And paste in the following script:
