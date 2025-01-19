@@ -152,6 +152,7 @@ nano Dockerfile
 And paste in the following script:
 ```
 # Use the ROS Humble base image
+#FROM ros:humble-ros-base
 FROM ros:humble-ros-base
 
 # Set environment variables
@@ -164,9 +165,14 @@ RUN apt-get update && apt-get install -y \
     python3-vcstool \
     python3-rosdep \
     build-essential \
+    v4l-utils \
     git \
     wget \
     && rm -rf /var/lib/apt/lists/*
+
+# install ros2 desktop packages (for RVIZ, RQT)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-humble-desktop=0.10.0-1* 
 
 # Create a workspace and clone the repository
 WORKDIR /ros2_ws/src
