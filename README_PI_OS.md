@@ -160,53 +160,67 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 SHELL ["/bin/bash", "-c"]
 
+# Upgrade everything
+RUN apt-get update && apt-get upgrade -y
+
 # Install necessary dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get remove meson
+RUN apt-get install -y \
     python3-vcstool \
     python3-rosdep \
+    python3-pip \
     build-essential \
     v4l-utils \
     git \
-    wget \
-    && rm -rf /var/lib/apt/lists/*
+    wget
+RUN python3 -m pip install meson jinja2 ply && \
+    apt-get install -y \
+    python3-colcon-meson
 
-# install ros2 desktop packages (for RVIZ, RQT)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ros-humble-desktop=0.10.0-1* 
-
-# Create a workspace and clone the repository
+# Download the .repos and clone packages
 WORKDIR /ros2_ws/src
 RUN wget https://raw.githubusercontent.com/bobzwik/GuideRPiVIO/main/ros2.repos && \
     vcs import --recursive < ros2.repos
 
 # Install pigpio (needed for cpp_imu_sub)
 WORKDIR /
-RUN git clone https://github.com/joan2937/pigpio  \
-    && cd pigpio \
-    && make \
-    && make install
+RUN git clone https://github.com/joan2937/pigpio && \
+    cd pigpio && \
+    make && \
+    make install
 
-# Copy other ROS packages
+# Copy other ROS packages from host
 COPY ros2_ws /ros2_ws/
+
+# Download libcamera and camera_ros
+WORKDIR /ros2_ws/src
+RUN git clone https://github.com/raspberrypi/libcamera.git && \
+    git clone https://github.com/christianrauch/camera_ros.git
+# Use latest libcamera tag with "vX.X.X" format
+WORKDIR /ros2_ws/src/libcamera
+RUN git fetch --tags && \
+    latestTag=$(git tag --list 'v*.*.*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1) && \
+    git checkout $latestTag
 
 # Install dependencies for the workspace 
 WORKDIR /ros2_ws
-RUN apt-get update \
-    && rosdep update \
-    && rosdep install --rosdistro ${ROS_DISTRO} --from-paths src --ignore-src -y --skip-keys pigpio \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    rosdep update && \
+    rosdep install --rosdistro ${ROS_DISTRO} --from-paths src --ignore-src -y --skip-keys pigpio --skip-keys libcamera
 
 # Build the workspace
-RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
-    && colcon build
+RUN source /opt/ros/${ROS_DISTRO}/setup.bash && \
+    colcon build
 
 # Source the ROS files and ROS workspace build files, for every opened shell
-RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc \
-    && echo "source /ros2_ws/install/setup.bash" >> /etc/bash.bashrc
+RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc && \
+    echo "source /ros2_ws/install/setup.bash" >> /etc/bash.bashrc
 
 # Copy entrypoint script into the image
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
+RUN rm -rf /var/lib/apt/lists/*
 
 # Set the default entrypoint
 ENTRYPOINT ["/entrypoint.sh"]
