@@ -250,11 +250,15 @@ exec "$@"
 Now build the docker image (takes about 530 seconds)
 ```
 cd ~/ros2_docker
-docker build -t ros2_micro_ros_agent .
+docker build -t ros2_rpi4 .
 ```
-And run the image! (`--privileged` is for `pigpio` to connect to the RPi's GPIO)
+And run the image!
 ```
-docker run -it --rm --network=host --privileged ros2_micro_ros_agent
+docker run -it --rm --network=host --privileged --name ros2_cont ros2_rpi4
+```
+Enter the docker with another terminal:
+```
+docker exec -it ros2_cont bash
 ```
 
 ## 3 - Flight Controller Setup
