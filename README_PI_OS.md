@@ -137,7 +137,7 @@ cd ~
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 ```
-Post installation steps
+Post-installation steps
 ```
 sudo groupadd docker
 sudo usermod -aG docker $USER
@@ -152,7 +152,6 @@ nano Dockerfile
 And paste in the following script:
 ```
 # Use the ROS Humble base image
-#FROM ros:humble-ros-base
 FROM ros:humble-ros-base
 
 # Set environment variables
