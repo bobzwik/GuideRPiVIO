@@ -1,0 +1,66 @@
+# Use the ROS Humble base image
+#FROM ros:humble-ros-base
+FROM ros:humble-ros-base
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+
+SHELL ["/bin/bash", "-c"]
+
+# Upgrade everything
+RUN apt-get update && apt-get upgrade -y
+
+# Install necessary dependencies
+RUN apt-get install -y \
+    python3-vcstool \
+    python3-rosdep \
+    python3-pip \
+    build-essential \
+    v4l-utils \
+    git \
+    wget
+
+# Download the .repos and clone packages
+WORKDIR /ros2_ws/src
+RUN wget https://raw.githubusercontent.com/bobzwik/GuideRPiVIO/main/ros2.repos && \
+    vcs import --recursive < ros2.repos
+
+# Install pigpio (needed for cpp_imu_sub)
+WORKDIR /
+RUN git clone https://github.com/joan2937/pigpio && \
+    cd pigpio && \
+    make && \
+    make install
+
+# Copy other ROS packages from host
+COPY ros2_ws /ros2_ws/
+
+RUN apt-get update && apt-get install -y \
+    ros-${ROS_DISTRO}-v4l2-camera \
+    ros-${ROS_DISTRO}-image-transport-plugins
+
+# Install dependencies for the workspace 
+WORKDIR /ros2_ws
+RUN apt-get update && \
+    rosdep update && \
+    rosdep install --rosdistro ${ROS_DISTRO} --from-paths src --ignore-src -y --skip-keys pigpio
+
+# Build the workspace
+RUN source /opt/ros/${ROS_DISTRO}/setup.bash && \
+    colcon build
+
+# Source the ROS files and ROS workspace build files, for every opened shell
+RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc && \
+    echo "source /ros2_ws/install/setup.bash" >> /etc/bash.bashrc
+
+# Copy entrypoint script into the image
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+RUN rm -rf /var/lib/apt/lists/*
+
+# Set the default entrypoint
+ENTRYPOINT ["/entrypoint.sh"]
+
+# Default command (can be overridden)
+CMD ["bash"]
