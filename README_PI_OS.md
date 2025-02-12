@@ -18,7 +18,7 @@ Gnd   ==> Gnd
 ### 2.1 - Ubuntu and Pi Setup
 Flash SD card with Raspberry Pi OS Bookworm (64 bit) using [Raspberry Pi Imager](https://www.raspberrypi.com/software/). This guide should work for both Desktop or Server versions of Pi OS, but if you're going Server, it would be best to configure your networking before going too far in the setup process, to allow yourself to `ssh` into the RPi4 and copy/paste the commands from a PC with a web explorer. 
 ```
-sudo update
+sudo apt update
 sudo rpi-eeprom-update -a
 sudo reboot
 sudo apt update
