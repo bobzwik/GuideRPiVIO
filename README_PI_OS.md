@@ -440,7 +440,7 @@ Use `iptables-persistent` to keep routing permanent between reboots
 sudo apt install iptables-persistent
 sudo netfilter-persistent save
 ```
-Now, the webserver is accessible from any device on the same network as the Pi, at the address <Pi address on network>:8080.
+Now, the webserver is accessible from any device on the same network as the Pi, at the address `<Pi address on network>:8080`.
 Port 8080 is necessary instead of 80, since Docker requires port 80 for accessing the internet when building images.
 
 ## 10 - Run PPPD at Boot
