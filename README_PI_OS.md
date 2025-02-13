@@ -431,7 +431,8 @@ net.ipv4.ip_forward=1
 ```
 Create routing tables
 ```
-sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination 192.168.13.65:80
+sudo iptables -P FORWARD ACCEPT
+sudo iptables -t nat -A PREROUTING -p tcp --dport 8080 -j DNAT --to-destination 192.168.13.65:80
 sudo iptables -t nat -A POSTROUTING -d 192.168.13.65 -j MASQUERADE
 ```
 Use `iptables-persistent` to keep routing permanent between reboots
@@ -439,6 +440,8 @@ Use `iptables-persistent` to keep routing permanent between reboots
 sudo apt install iptables-persistent
 sudo netfilter-persistent save
 ```
+Now, the webserver is accessible from any device on the same network as the Pi, at the address <Pi address on network>:8080.
+Port 8080 is necessary instead of 80, since Docker requires port 80 for accessing the internet when building images.
 
 ## 10 - Run PPPD at Boot
 Create `pppd` parameter file
