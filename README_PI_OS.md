@@ -515,16 +515,9 @@ sudo nmcli connection add type wifi ifname "*" con-name ROS2_Network ssid ROS2_N
 sudo nmcli connection modify ROS2_Network wifi-sec.key-mgmt wpa-psk wifi-sec.psk "po5i7ion!"
 sudo nmcli connection modify ROS2_Network connection.autoconnect yes
 sudo nmcli connection modify ROS2_Network connection.autoconnect-priority 10
-sudo nmcli connection modify ROS2_Network ipv4.addresses 192.168.8.100/24 
-sudo nmcli connection modify ROS2_Network ipv4.gateway 192.168.8.1 
-sudo nmcli connection modify ROS2_Network ipv4.dns 8.8.8.8 
-sudo nmcli connection modify ROS2_Network ipv4.method manual
 nmcli connection show ROS2_Network
 ```
-Edit ` sudo nano /etc/netplan/*.yaml` and change to `renderer: NetworkManager`. Then
-```
-sudo netplan apply
-```
+On your `ROS2_Network` network router, you can view the Pi's IP address or reserve an address for it. In my case, I reserved 192.168.8.100.
 
 Create shell script
 ```
@@ -535,7 +528,7 @@ And add
 #!/bin/bash
 
 # Define the preferred Wi-Fi network
-PREFERRED="MDTK_RPI"
+PREFERRED="ROS2_Network"
 DEBUG=true
 dbg() {
     if [ "$DEBUG" = true ]; then
@@ -545,7 +538,7 @@ dbg() {
 
 while true; do
     # Get the name of the currently active connection
-    CURRENT=$(nmcli -g NAME con show --active)
+    CURRENT=$(nmcli -g NAME,DEVICE con show --active | grep "$(nmcli -t -f DEVICE,TYPE device | grep ':wifi' | cut -d: -f1)" | cut -d: -f1)
 
     # Check if the current network is not the preferred network
     if [ "$CURRENT" != "$PREFERRED" ]; then
@@ -557,7 +550,7 @@ while true; do
             nmcli c up "$PREFERRED"
         fi
     fi
-    
+
     # Wait 20 seconds before checking again
     sleep 20
 done
