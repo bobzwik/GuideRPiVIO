@@ -511,15 +511,15 @@ sudo systemctl disable pppd.service
 ## 11 - Switch to Preferred Wifi Automatically
 ```
 sudo apt install network-manager
-sudo nmcli connection add type wifi ifname "*" con-name MDTK_RPI ssid MDTK_RPI
-sudo nmcli connection modify MDTK_RPI wifi-sec.key-mgmt wpa-psk wifi-sec.psk "17B74|q1*gg"
-sudo nmcli connection modify MDTK_RPI connection.autoconnect yes
-sudo nmcli connection modify MDTK_RPI connection.autoconnect-priority 10
-sudo nmcli connection modify MDTK_RPI ipv4.addresses 192.168.137.100/24 
-sudo nmcli connection modify MDTK_RPI ipv4.gateway 192.168.137.1 
-sudo nmcli connection modify MDTK_RPI ipv4.dns 8.8.8.8 
-sudo nmcli connection modify MDTK_RPI ipv4.method manual
-nmcli connection show MDTK_RPI
+sudo nmcli connection add type wifi ifname "*" con-name ROS2_Network ssid ROS2_Network
+sudo nmcli connection modify ROS2_Network wifi-sec.key-mgmt wpa-psk wifi-sec.psk "po5i7ion!"
+sudo nmcli connection modify ROS2_Network connection.autoconnect yes
+sudo nmcli connection modify ROS2_Network connection.autoconnect-priority 10
+sudo nmcli connection modify ROS2_Network ipv4.addresses 192.168.8.100/24 
+sudo nmcli connection modify ROS2_Network ipv4.gateway 192.168.8.1 
+sudo nmcli connection modify ROS2_Network ipv4.dns 8.8.8.8 
+sudo nmcli connection modify ROS2_Network ipv4.method manual
+nmcli connection show ROS2_Network
 ```
 Edit ` sudo nano /etc/netplan/*.yaml` and change to `renderer: NetworkManager`. Then
 ```
