@@ -1,5 +1,3 @@
-
-
 # GuideRPiVIO
 
 ## 1 - Wiring
@@ -336,23 +334,16 @@ sudo pppd /dev/ttyAMA0 12500000 192.168.13.16:192.168.13.65 crtscts debug noauth
 ```
 This takes the incoming stream from `/dev/ttyAMA0` (at a 12.5M Baudrate) destined for `192.168.13.16` (the local IP of `pppd`) and defines the remote (the flight controller) as `192.168.13.65`. You can change `65` for anything you want.
 
-Then, open another terminal and start the `micro_ros_agent`, listening on port 2019 (specified in the `DDS_*` parameters).
+Then, run the docker container.
+```
+docker run -it --rm --network=host --privileged --name ros2_cont ros2_rpi4
+```
+And start the `micro_ros_agent`, listening on port 2019 (specified in the `DDS_*` parameters). No need to source your repo (`source install/setup.bash`) as it is already sourced in your `/etc/bash.bashrc` (as per the Dockerfile).
 
 ```
-cd ~/ros2_ws
-source install/setup.bash
 ros2 run micro_ros_agent micro_ros_agent udp4 --port 2019
 ```
-Nothing will happen at first. This is because DDS on the flight controller will shutdown if it doesn't connect to the `micro_ros_agent` within 10 seconds of boot. You have to reboot the flight controller. Either power cycle the flight controller, or open another terminal to connect to the flight controller using Mavlink over the PPP connection:
-
-```
-mavproxy.py --console --master=udp:192.168.13.16:15001
-```
-Send the command `reboot` to reboot your flight controller.
-
-You should see the `micro_ros_agent` acknowledge the reception of the DDS topics.
-
-You can now view the available topics with
+You should see the `micro_ros_agent` acknowledge the reception of the DDS topics. You can now view the available topics with
 ```
 ros2 topic list -v
 Published topics:
@@ -384,8 +375,15 @@ View the contents of a topic with
 ```
 ros2 topic echo /ap/imu/experimental/data
 ```
+You can also start Mavproxy on the host (not in the Docker container)
+```
+mavproxy.py --master=udp:192.168.13.16:15001
+mavproxy.py --master=udp:192.168.13.16:15001 --out=udpbcast:192.168.1.255:14550
+mavproxy.py --master=udp:192.168.13.16:15001 --out=udpbcast:192.168.8.255:14550
+```
 
 ## 7 - Updating Repos and Dependencies
+On the host:
 ```
 cd ~/ardupilot
 git pull --recurse-submodules
@@ -394,36 +392,12 @@ git pull --recurse-submodules
 cd ~/ros2_ws/Micro-XRCE-DDS-Gen
 git pull --recurse-submodules
 ```
+For updating the repos inside the docker, it is best to rebuild the image from scratch.
 ```
-cd ~/ros2_ws
-vcs custom --args remote update
-vcs import src < src/ros2.repos --recursive
-vcs pull src
-```
-if dependencies have changed
-```
-rosdep update
-rosdep install --rosdistro humble --from-paths src --ignore-src
-```
-```
-colcon build --packages-select micro_ros_agent
+docker build --no-cache -t ros2_rpi4 .
 ```
 
-## 8 - Enable SSH
-```
-sudo apt update
-sudo apt install openssh-server
-```
-```
-sudo systemctl enable ssh
-sudo systemctl start ssh
-```
-Check RPi IP address
-```
-hostname -I
-```
-
-## 9 - Forward Webserver to Other PC
+## 8 - Forward Webserver to Other PC
 
 Edit `/etc/sysctl.conf` and uncomment
 ```
@@ -443,72 +417,7 @@ sudo netfilter-persistent save
 Now, the webserver is accessible from any device on the same network as the Pi, at the address `<Pi address on network>:8080`.
 Port 8080 is necessary instead of 80, since Docker requires port 80 for accessing the internet when building images.
 
-## 10 - Run PPPD at Boot
-Create `pppd` parameter file
-```
-sudo nano /etc/ppp/ip_config.txt
-```
-And add
-```
-# /etc/ppp/ip_config.txt
-LOCAL_IP=192.168.13.16
-REMOTE_IP=192.168.13.65
-BAUD=12500000
-```
-Create shell script that runs `pppd`
-```
-sudo nano /usr/local/bin/start_pppd.sh
-```
-And add
-```
-#!/bin/bash
-
-# Read the IPs from the configuration file
-source /etc/ppp/ip_config.txt
-
-# Start pppd with the IPs 
-# (pppd is in /usr/local/sbin/ if 2.5.1 manually compiled, otherwise in /usr/sbin/)
-/usr/local/sbin/pppd /dev/ttyAMA0 $BAUD $LOCAL_IP:$REMOTE_IP crtscts debug noauth nodetach local proxyarp ktune
-```
-Make it executable
-```
-sudo chmod +x /usr/local/bin/start_pppd.sh
-```
-Make `pppd` service file
-```
-sudo nano /etc/systemd/system/pppd.service
-```
-And add
-```
-[Unit]
-Description=PPP Daemon Service
-After=network.target
-
-[Service]
-Type=simple
-ExecStart=/usr/local/bin/start_pppd.sh
-ExecStop=/bin/kill $MAINPID
-Restart=on-failure
-RestartSec=5s
-
-[Install]
-WantedBy=multi-user.target
-```
-Enable and start service
-```
-sudo systemctl daemon-reload
-sudo systemctl enable pppd.service
-sudo systemctl start pppd.service
-```
-Other commands:
-```
-sudo systemctl status pppd.service
-sudo systemctl restart pppd.service
-sudo systemctl stop pppd.service
-sudo systemctl disable pppd.service
-```
-
-## 11 - Switch to Preferred Wifi Automatically
+## 9 - Switch to Preferred Wifi Automatically
 ```
 sudo apt install network-manager
 sudo nmcli connection add type wifi ifname "*" con-name ROS2_Network ssid ROS2_Network
@@ -583,7 +492,72 @@ sudo systemctl enable wifi-switch.service
 sudo systemctl start wifi-switch.service
 ```
 
-## 12 - Github SSH Key
+## 10 - Run PPPD at Boot
+Create `pppd` parameter file
+```
+sudo nano /etc/ppp/ip_config.txt
+```
+And add
+```
+# /etc/ppp/ip_config.txt
+LOCAL_IP=192.168.13.16
+REMOTE_IP=192.168.13.65
+BAUD=12500000
+```
+Create shell script that runs `pppd`
+```
+sudo nano /usr/local/bin/start_pppd.sh
+```
+And add
+```
+#!/bin/bash
+
+# Read the IPs from the configuration file
+source /etc/ppp/ip_config.txt
+
+# Start pppd with the IPs 
+# (pppd is in /usr/local/sbin/ if 2.5.1 manually compiled, otherwise in /usr/sbin/)
+/usr/local/sbin/pppd /dev/ttyAMA0 $BAUD $LOCAL_IP:$REMOTE_IP crtscts debug noauth nodetach local proxyarp ktune
+```
+Make it executable
+```
+sudo chmod +x /usr/local/bin/start_pppd.sh
+```
+Make `pppd` service file
+```
+sudo nano /etc/systemd/system/pppd.service
+```
+And add
+```
+[Unit]
+Description=PPP Daemon Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/start_pppd.sh
+ExecStop=/bin/kill $MAINPID
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
+```
+Enable and start service
+```
+sudo systemctl daemon-reload
+sudo systemctl enable pppd.service
+sudo systemctl start pppd.service
+```
+Other commands:
+```
+sudo systemctl status pppd.service
+sudo systemctl restart pppd.service
+sudo systemctl stop pppd.service
+sudo systemctl disable pppd.service
+```
+
+## 11 - Github SSH Key
 ```
 ssh-keygen -t ed25519 -C "john.bobzwik@gmail.com"
 eval "$(ssh-agent -s)"
@@ -593,12 +567,3 @@ Then copy output of
 ```
 cat ~/.ssh/id_ed25519.pub
 ```
-
-## 13 - Custom IMU Subscriber
-```
-cd ~/ros2_ws/src
-git clone git@github.com:bobzwik/cpp_imu_sub.git
-cd ~/ros2_ws
-colcon build --packages-select cpp_imu_sub
-```
-If testing with LED, follow instructions here: https://github.com/bobzwik/cpp_imu_sub/blob/main/README.md
