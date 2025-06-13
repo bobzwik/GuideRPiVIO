@@ -307,6 +307,7 @@ DDS_IP1,168
 DDS_IP2,13
 DDS_IP3,16
 DDS_UDP_PORT,2019
+DDS_MAX_RETRY,0
 ```
 This sets the DDS destination to the same address at the one specified by the `NET_*` parameters, but to port `2019` instead.
 
