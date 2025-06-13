@@ -170,7 +170,7 @@ RUN apt-get install -y \
     v4l-utils \
     git \
     wget
-RUN python3 -m pip install meson jinja2 ply && \
+RUN python3 -m pip install meson==1.7.2 jinja2 ply && \
     apt-get install -y \
     python3-colcon-meson
 
