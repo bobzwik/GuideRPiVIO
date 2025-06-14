@@ -289,7 +289,7 @@ NET_P1_IP0,192
 NET_P1_IP1,168
 NET_P1_IP2,13
 NET_P1_IP3,16
-NET_P1_PORT,15001
+NET_P1_PORT,14550
 NET_P1_PROTOCOL,2
 NET_P1_TYPE,1
 NET_P2_TYPE,0
@@ -378,9 +378,9 @@ ros2 topic echo /ap/imu/experimental/data
 ```
 You can also start Mavproxy on the host (not in the Docker container)
 ```
-mavproxy.py --master=udp:192.168.13.16:15001
-mavproxy.py --master=udp:192.168.13.16:15001 --out=udpbcast:192.168.1.255:14550
-mavproxy.py --master=udp:192.168.13.16:15001 --out=udpbcast:192.168.8.255:14550
+mavproxy.py --master=udp:192.168.13.16:14550
+mavproxy.py --master=udp:192.168.13.16:14550 --out=udpbcast:192.168.1.255:14550
+mavproxy.py --master=udp:192.168.13.16:14550 --out=udpbcast:192.168.8.255:14550
 ```
 
 ## 7 - Updating Repos and Dependencies
