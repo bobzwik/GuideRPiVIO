@@ -105,13 +105,19 @@ cd Micro-XRCE-DDS-Gen/
 echo "export PATH=\$PATH:$PWD/scripts" >> ~/.bashrc
 sudo reboot
 ```
-### 2.5 - cpp_imu_sub
+
+### 2.5 - mavp2p
+MAVproxy can be used to connect to the flight controller from the Pi (MAVproxy is installed with Ardupilot's prereq script). MAVproxy can also forward the connection to a different network, to allow another computer on that network to connect to the flight controller. However, MAVproxy is CPU heavy if that is the only use for it.
+Instead, we can instal `mavp2p`, a [flexible and efficient Mavlink proxy / bridge / router](https://github.com/bluenviron/mavp2p) to route the Mavlink connection to a different network.
+
+
+### 2.6 - cpp_imu_sub
 ```
 mkdir -p ~/ros2_docker/ros2_ws/src && cd ~/ros2_docker/ros2_ws/src
 git clone https://github.com/bobzwik/cpp_imu_sub.git
 ```
 
-### 2.6 - Install Docker
+### 2.7 - Install Docker
 ```
 cd ~
 curl -fsSL https://get.docker.com -o get-docker.sh
@@ -123,7 +129,7 @@ sudo groupadd docker
 sudo usermod -aG docker $USER
 sudo reboot
 ```
-### 2.7 - Create Docker Image
+### 2.8 - Create Docker Image
 Create Dockerfile
 ```
 cd ~/ros2_docker
