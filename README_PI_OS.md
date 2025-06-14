@@ -108,8 +108,21 @@ sudo reboot
 
 ### 2.5 - mavp2p
 MAVproxy can be used to connect to the flight controller from the Pi (MAVproxy is installed with Ardupilot's prereq script). MAVproxy can also forward the connection to a different network, to allow another computer on that network to connect to the flight controller. However, MAVproxy is CPU heavy if that is the only use for it.
-Instead, we can instal `mavp2p`, a [flexible and efficient Mavlink proxy / bridge / router](https://github.com/bluenviron/mavp2p) to route the Mavlink connection to a different network.
 
+Instead, we can install `mavp2p`, a [flexible and efficient Mavlink proxy / bridge / router](https://github.com/bluenviron/mavp2p) to route the Mavlink connection to a different network.
+
+First, choose a version of `mavp2p` (the latest, most likely) from the [releases page](https://github.com/bluenviron/mavp2p/releases). Then download the appropriate `tar.gz` (for a Pi4 running a 64bit OS, it is `arm64v8`) using:
+```
+cd ~
+wget https://github.com/bluenviron/mavp2p/releases/download/v1.3.1/mavp2p_v1.3.1_linux_arm64v8.tar.gz
+```
+Replacing both `v1.3.1` by the version of your choice.
+
+Then:
+```
+tar xzf mavp2p_v1.3.1_linux_arm64v8.tar.gz
+sudo mv mavp2p /usr/local/sbin
+```
 
 ### 2.6 - cpp_imu_sub
 ```
