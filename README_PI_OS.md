@@ -392,6 +392,7 @@ git pull --recurse-submodules
 ```
 cd ~/ros2_ws/Micro-XRCE-DDS-Gen
 git pull --recurse-submodules
+./gradlew assemble
 ```
 For updating the repos inside the docker, it is best to rebuild the image from scratch.
 ```
