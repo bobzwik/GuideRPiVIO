@@ -41,6 +41,7 @@ xhost +
 ```
 
 Click bottom left. Open new dev container. ROS ijnek. Additional options. humble. desktop-full
+
 Dockerfile:
 ```
 FROM osrf/ros:humble-desktop-full
