@@ -383,6 +383,15 @@ mavproxy.py --master=udp:192.168.13.16:14550
 mavproxy.py --master=udp:192.168.13.16:14550 --out=udpbcast:192.168.1.255:14550
 mavproxy.py --master=udp:192.168.13.16:14550 --out=udpbcast:192.168.8.255:14550
 ```
+Or preferably `mavp2p`, which opens mavlink endpoints and connects them.
+```
+mavp2p udps:192.168.13.16:14550 udpb:192.168.1.255:14550
+mavp2p --streamreq-disable udps:192.168.13.16:14550 udpb:192.168.1.255:14550
+```
+Example if another local endpoint is required:
+```
+mavp2p --streamreq-disable udps:192.168.13.16:14550 udpb:192.168.1.255:14550 udps:0.0.0.0:14551
+```
 
 ## 7 - Updating Repos and Dependencies
 On the host:
