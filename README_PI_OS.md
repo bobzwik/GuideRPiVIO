@@ -68,25 +68,7 @@ gpu_freq=750
 ```
 This will not improve DDS or PPP. It's only in case you plan on running CPU intensive algorithms alongside DDS.
 
-### 2.2 - If Ubuntu Server and SSH
-Issue where the "Wait for network" service unnecessarily making the boot long
-```
-sudo systemctl edit systemd-networkd-wait-online
-```
-Add this under the first two commented lines
-```
-[Service]
-ExecStart=
-ExecStart=/lib/systemd/systemd-networkd-wait-online --timeout=10 --interface=wlan0
-```
-Then
-```
-sudo systemctl daemon-reload 
-sudo systemctl restart systemd-networkd-wait-online
-sudo reboot
-```
-
-### 2.3 - PPPD
+### 2.2 - PPPD
 Most likely, the version by default on Bookworm is version `2.4.9` (you can check with `pppd --version`. While you can still use version `2.4.9`, it will not be able to achieve the fastest 12.5M baudrate. You will need version `2.5.1`.
 ```
 cd ~
@@ -100,7 +82,7 @@ sudo make install
 ```
 Andrew Tridgell has a [video](https://youtu.be/VGy6eOf7Uqk?si=zquWZOHEGXQJZNzV) showcasing the uses of PPP.
 
-### 2.4 - Ardupilot
+### 2.3 - Ardupilot
 Install the Ardupilot development environment ([more info here](https://ardupilot.org/dev/docs/building-setup-linux.html)).
 ```
 cd ~
@@ -112,7 +94,7 @@ Tools/environment_install/install-prereqs-ubuntu.sh -y
 sudo reboot
 ```
 
-### 2.5 - Micro-XRCE-DDS-Gen
+### 2.4 - Micro-XRCE-DDS-Gen
 Install Micro-XRCE-DDS-Gen. This is needed when building the Ardupilot firmware with DDS enabled.
 ```
 cd ~
@@ -123,13 +105,13 @@ cd Micro-XRCE-DDS-Gen/
 echo "export PATH=\$PATH:$PWD/scripts" >> ~/.bashrc
 sudo reboot
 ```
-### 2.6 - cpp_imu_sub
+### 2.5 - cpp_imu_sub
 ```
 mkdir -p ~/ros2_docker/ros2_ws/src && cd ~/ros2_docker/ros2_ws/src
 git clone https://github.com/bobzwik/cpp_imu_sub.git
 ```
 
-### 2.7 - Install Docker
+### 2.6 - Install Docker
 ```
 cd ~
 curl -fsSL https://get.docker.com -o get-docker.sh
@@ -141,7 +123,7 @@ sudo groupadd docker
 sudo usermod -aG docker $USER
 sudo reboot
 ```
-### 2.8 - Create Docker Image
+### 2.7 - Create Docker Image
 Create Dockerfile
 ```
 cd ~/ros2_docker
