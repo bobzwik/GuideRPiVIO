@@ -325,7 +325,7 @@ Using Mission Planner's MAVftp tool, upload the `net_webserver.lua` file to the 
 
 ```
 WEB_ENABLE,1
-WEB_BIND_PORT,80
+WEB_BIND_PORT,8080
 ```
 
 ## 6 - Run
@@ -418,7 +418,7 @@ net.ipv4.ip_forward=1
 Create routing tables
 ```
 sudo iptables -P FORWARD ACCEPT
-sudo iptables -t nat -A PREROUTING -p tcp --dport 8080 -j DNAT --to-destination 192.168.13.65:80
+sudo iptables -t nat -A PREROUTING -p tcp --dport 8080 -j DNAT --to-destination 192.168.13.65:8080
 sudo iptables -t nat -A POSTROUTING -d 192.168.13.65 -j MASQUERADE
 ```
 Use `iptables-persistent` to keep routing permanent between reboots
