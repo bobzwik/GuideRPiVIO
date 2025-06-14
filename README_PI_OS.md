@@ -69,7 +69,7 @@ gpu_freq=750
 This will not improve DDS or PPP. It's only in case you plan on running CPU intensive algorithms alongside DDS.
 
 ### 2.2 - PPPD
-Most likely, the version by default on Bookworm is version `2.4.9` (you can check with `pppd --version`. While you can still use version `2.4.9`, it will not be able to achieve the fastest 12.5M baudrate. You will need version `2.5.1`.
+Most likely, the version by default on Bookworm is version `2.4.9` (you can check with `pppd --version`). While you can still use version `2.4.9`, it will not be able to achieve the fastest 12.5M baudrate. You will need version `2.5.1`.
 ```
 cd ~
 sudo apt update && sudo apt install curl build-essential libssl-dev autogen autoconf libtool -y
