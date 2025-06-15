@@ -266,7 +266,7 @@ If using a brand new flight controller that doesn't have Ardupilot pre-installed
 Once your flight controller is ready, plug it via USB to your RPi 4. Now back on your RPi 4, build the Ardupilot firmware with DDS and PPP enabled and upload it to your FC. When doing `./waf configure`, specify the correct board.
 ```
 cd ~/ardupilot
-./waf configure --board MatekH743 --enable-dds --enable-PPP
+./waf configure --board MatekH743 --enable-DDS --enable-PPP
 ./waf copter --upload
 ```
 This will take some time.
