@@ -407,7 +407,7 @@ cd ~/ardupilot
 git pull --recurse-submodules
 ```
 ```
-cd ~/ros2_ws/Micro-XRCE-DDS-Gen
+cd ~/Micro-XRCE-DDS-Gen
 git pull --recurse-submodules
 ./gradlew assemble
 ```
