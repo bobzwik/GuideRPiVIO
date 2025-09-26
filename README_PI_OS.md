@@ -1,5 +1,7 @@
 # GuideRPiVIO
 
+NOTE: The following guide uses hardware flow-control for the serial connection between the FC and the RPi. I thought this was necessary for a 12.5 MBaud datarate, but it turns out that hardware flow-control isn't needed, at least for the hardware I have (H743 processor). I also did not do extensive testing without hardware flow-control, but I plan to if I decide to switch to a flight controller that doesn't have RTS and CTS pins.
+
 ## 1 - Wiring
 
 ```
