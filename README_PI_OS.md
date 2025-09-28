@@ -169,7 +169,6 @@ SHELL ["/bin/bash", "-c"]
 RUN apt-get update && apt-get upgrade -y
 
 # Install necessary dependencies
-RUN apt-get remove meson
 RUN apt-get install -y \
     python3-vcstool \
     python3-rosdep \
@@ -178,9 +177,7 @@ RUN apt-get install -y \
     v4l-utils \
     git \
     wget
-RUN python3 -m pip install meson==1.7.2 jinja2 ply && \
-    apt-get install -y \
-    python3-colcon-meson
+RUN python3 -m pip install colcon-meson jinja2 ninja ply
 
 # Download the .repos and clone packages
 WORKDIR /ros2_ws/src
